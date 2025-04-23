@@ -225,49 +225,54 @@ with tabs[1]:
 
 
 with tabs[2]:
-   st.markdown("## Visualization Section")
+    st.markdown("## Visualization Section")
 
 
-   # Create a section for displaying correlations
-   st.markdown("### Correlation Between Columns")
-   if st.checkbox('Show Correlation Matrix'):
-       numeric_columns = df.select_dtypes(include=['number'])
-       correlation_matrix = numeric_columns.corr()
-       st.write(correlation_matrix)
-       st.markdown("#### Heatmap of Correlation Matrix")
-       # Display the heatmap
-       fig, ax = plt.subplots()
-       sns.heatmap(correlation_matrix, annot=True, fmt=".2f", cmap='coolwarm', ax=ax)
-       st.pyplot(fig)
+    # Create a section for displaying correlations
+    st.markdown("### Correlation Between Columns")
+    if st.checkbox('Show Correlation Matrix'):
+        numeric_columns = df.select_dtypes(include=['number'])
+        correlation_matrix = numeric_columns.corr()
+        st.write(correlation_matrix)
+        st.markdown("#### Heatmap of Correlation Matrix")
+        # Display the heatmap
+        fig, ax = plt.subplots(figsize=(12, 12))
+        
+        sns.heatmap(correlation_matrix, annot=True, fmt=".2f", cmap='coolwarm', ax=ax, annot_kws={'size': 7},  square=True)
+        plt.xticks(rotation=45, ha='right', fontsize=6)  # Reduce x-axis label size
+        plt.yticks(rotation=0, fontsize=6)  # Reduce y-axis label size
+        # Adjust layout to prevent label cutoff
+        plt.tight_layout()
+        st.pyplot(fig)
 
 
 with tabs[3]:
-   st.markdown("## NLP Reviews Analysis Section")
-   # Add your NLP analysis code here
-   # Load the SentimentIntensityAnalyzer
-   nltk.download('vader_lexicon')
-   sia = SentimentIntensityAnalyzer()
+    st.markdown("## NLP Reviews Analysis Section")
+    # Add your NLP analysis code here
+    # Load the SentimentIntensityAnalyzer
+    nltk.download('vader_lexicon')
+    sia = SentimentIntensityAnalyzer()
 
 
-   # Get user input for review
-   st.markdown("### Enter a Review")
-   user_review = st.text_area("Type your review here:")
+    # Get user input for review
+    st.markdown("### Enter a Review")
+    user_review = st.text_area("Type your review here:")
 
 
-   if st.button("Analyze Sentiment"):
-       if user_review.strip():
-           # Get sentiment scores
-           sentiment_scores = sia.polarity_scores(user_review)
-           st.markdown("### Sentiment Analysis Results")
+    if st.button("Analyze Sentiment"):
+        if user_review.strip():
+            # Get sentiment scores
+            sentiment_scores = sia.polarity_scores(user_review)
+            st.markdown("### Sentiment Analysis Results")
 
 
-           if sentiment_scores['compound'] > 0:
-               st.markdown("### Overall Sentiment: **Positive**")
-               st.success("Positive Sentiment")
-           elif sentiment_scores['compound'] < 0:
-               st.markdown("### Overall Sentiment: **Negative**")
-               st.error("Negative Sentiment")
-           else:
-               st.markdown("### Overall Sentiment: **Neutral**")
-               st.warning("Neutral Sentiment")
+            if sentiment_scores['compound'] > 0:
+                st.markdown("### Overall Sentiment: **Positive**")
+                st.success("Positive Sentiment")
+            elif sentiment_scores['compound'] < 0:
+                st.markdown("### Overall Sentiment: **Negative**")
+                st.error("Negative Sentiment")
+            else:
+                st.markdown("### Overall Sentiment: **Neutral**")
+                st.warning("Neutral Sentiment")
 
