@@ -56,7 +56,7 @@ st.markdown("""
 
 
 # Load Data
-df = pd.read_csv('data/full_df.csv')
+df = pd.read_csv('data/full_df2.csv')
 
 
 # Set title and description
