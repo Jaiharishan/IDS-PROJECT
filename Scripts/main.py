@@ -253,7 +253,6 @@ with tabs[3]:
     nltk.download('vader_lexicon')
     sia = SentimentIntensityAnalyzer()
 
-
     # Get user input for review
     st.markdown("### Enter a Review")
     user_review = st.text_area("Type your review here:")
