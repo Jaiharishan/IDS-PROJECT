@@ -72,113 +72,159 @@ st.markdown(
 
 
 # Replace the sidebar navigation with tabs
-tabs = st.tabs(["Prediction", "Visualization", "NLP Reviews Analysis"])
+tabs = st.tabs(["Delivery Times Prediction", "Freight Value Prediction", "Visualization", "NLP Reviews Analysis"])
 
 
 with tabs[0]:
-   # The prediction code is already in place below
-   st.title("Predicting Order Delivery Times 🚚")
+    # The prediction code is already in place below
+    st.title("Predicting Order Delivery Times 🚚")
 
 
-   # Load the Model
-   model = load('./Models/random_forest_model.pkl')
+    # Load the Model
+    model = load('./Models/random_forest_model.pkl')
 
 
-   # Get user inputs
-   features = ['product_category_name', 'customer_city', 'freight_value', 'delivery_difference', 'order_purchase_month']
+    # Get user inputs
+    features = ['product_category_name', 'customer_city', 'freight_value', 'delivery_difference', 'order_purchase_month']
 
 
-   # Style the inputs
-   st.markdown("### Input Features")
-   col1, col2 = st.columns(2)
+    # Style the inputs
+    st.markdown("### Input Features")
+    col1, col2 = st.columns(2)
 
 
-   with col1:
-       product_category_name = st.selectbox('Product Category Name', df['product_category_name'].unique())
-       customer_city = st.selectbox('Customer City', df['customer_city'].unique())
+    with col1:
+        product_category_name = st.selectbox('Product Category Name', df['product_category_name'].unique())
+        customer_city = st.selectbox('Customer City', df['customer_city'].unique())
 
 
-   with col2:
-       freight_value = st.number_input('Freight Value', min_value=0.0, step=0.1)
-       delivery_difference = st.number_input('Delivery Difference', min_value=0.0, step=0.1)
+    with col2:
+        freight_value = st.number_input('Freight Value', min_value=0.0, step=0.1)
+        delivery_difference = st.number_input('Delivery Difference', min_value=0.0, step=0.1)
 
 
-   order_purchase_month = st.selectbox(
-       'Order Purchase Month',
-       {
-           'January': 1, 'February': 2, 'March': 3, 'April': 4, 'May': 5, 'June': 6,
-           'July': 7, 'August': 8, 'September': 9, 'October': 10, 'November': 11, 'December': 12
-       }.keys()
-   )
+    order_purchase_month = st.selectbox(
+        'Order Purchase Month',
+        {
+            'January': 1, 'February': 2, 'March': 3, 'April': 4, 'May': 5, 'June': 6,
+            'July': 7, 'August': 8, 'September': 9, 'October': 10, 'November': 11, 'December': 12
+        }.keys()
+    )
 
 
-   # Convert the selected month to its corresponding numeric value
-   order_purchase_month = {
-       'January': 1, 'February': 2, 'March': 3, 'April': 4, 'May': 5, 'June': 6,
-       'July': 7, 'August': 8, 'September': 9, 'October': 10, 'November': 11, 'December': 12
-   }[order_purchase_month]
+    # Convert the selected month to its corresponding numeric value
+    order_purchase_month = {
+        'January': 1, 'February': 2, 'March': 3, 'April': 4, 'May': 5, 'June': 6,
+        'July': 7, 'August': 8, 'September': 9, 'October': 10, 'November': 11, 'December': 12
+    }[order_purchase_month]
+
+    # Encode the categorical features
+    # Initialize LabelEncoders
+    product_category_encoder = LabelEncoder()
+    customer_city_encoder = LabelEncoder()
+    order_purchase_month_encoder = LabelEncoder()
+
+    # Fit the encoders on the respective columns
+    df['product_category_name_encoded'] = product_category_encoder.fit_transform(df['product_category_name'])
+    df['customer_city_encoded'] = customer_city_encoder.fit_transform(df['customer_city'])
+    df['order_purchase_month_encoded'] = order_purchase_month_encoder.fit_transform(df['order_purchase_month'])
 
 
-   # Encode the categorical features
-   # Initialize LabelEncoders
-   product_category_encoder = LabelEncoder()
-   customer_city_encoder = LabelEncoder()
-   order_purchase_month_encoder = LabelEncoder()
+    # Transform user inputs
+    product_category_name = product_category_encoder.transform([product_category_name])[0]
+    customer_city = customer_city_encoder.transform([customer_city])[0]
+    order_purchase_month = order_purchase_month_encoder.transform([order_purchase_month])[0]
 
 
-   # Fit the encoders on the respective columns
-   df['product_category_name_encoded'] = product_category_encoder.fit_transform(df['product_category_name'])
-   df['customer_city_encoded'] = customer_city_encoder.fit_transform(df['customer_city'])
-   df['order_purchase_month_encoded'] = order_purchase_month_encoder.fit_transform(df['order_purchase_month'])
+    # Make predictions
+    if st.button('Predict'):
+        input_data = pd.DataFrame({
+            'product_category_name_encoded': [product_category_name],
+            'customer_city_encoded': [customer_city],
+            'order_purchase_month_encoded': [order_purchase_month],
+            'freight_value': [freight_value],
+            'delivery_difference': [delivery_difference],
+        })
 
 
-   # Transform user inputs
-   product_category_name = product_category_encoder.transform([product_category_name])[0]
-   customer_city = customer_city_encoder.transform([customer_city])[0]
-   order_purchase_month = order_purchase_month_encoder.transform([order_purchase_month])[0]
+        prediction = model.predict(input_data)
+        days = int(prediction[0])
+        hours = int((prediction[0] - days) * 24)
 
 
-   # Make predictions
-   if st.button('Predict'):
-       input_data = pd.DataFrame({
-           'product_category_name_encoded': [product_category_name],
-           'customer_city_encoded': [customer_city],
-           'order_purchase_month_encoded': [order_purchase_month],
-           'freight_value': [freight_value],
-           'delivery_difference': [delivery_difference],
-       })
-
-
-       prediction = model.predict(input_data)
-       days = int(prediction[0])
-       hours = int((prediction[0] - days) * 24)
-
-
-       col1, col2 = st.columns([1, 1])
+        col1, col2 = st.columns([1, 1])
 
 
 
 
-       with col1:
-           st.markdown(f"""
-           <div class="time-card days">
-               <div class="header-font">Days</div>
-               <div class="big-font">{days}</div>
-           </div>
-           """, unsafe_allow_html=True)
-      
+        with col1:
+            st.markdown(f"""
+            <div class="time-card days">
+                <div class="header-font">Days</div>
+                <div class="big-font">{days}</div>
+            </div>
+            """, unsafe_allow_html=True)
+        
 
 
-       with col2:
-           st.markdown(f"""
-           <div class="time-card hours">
-               <div class="header-font">Hours</div>
-               <div class="big-font">{hours}</div>
-           </div>
-           """, unsafe_allow_html=True)
+        with col2:
+            st.markdown(f"""
+            <div class="time-card hours">
+                <div class="header-font">Hours</div>
+                <div class="big-font">{hours}</div>
+            </div>
+            """, unsafe_allow_html=True)
+    
+    
+    
+with tabs[1]:   
+    # Prediction for Freight Value
+    st.title("Predicting Item Freight Values 💸")
+
+    # Load the Model
+    freight_model = load('./Models/rf_freight_model.pkl')
+
+    # Get user inputs
+    freight_features = ['product_weight_g', 'total_order_value', 'price']
+
+    # Style the inputs
+    st.markdown("### Input Features")
+    col1, col2 = st.columns(2)
+
+    with col1:
+        product_weight_g = st.number_input('Product Weight in Grams',  min_value=0.0, max_value=10000.0, step=0.1)
+        total_order_value = st.number_input('Total Order Value', min_value=0.0, max_value=100000.0, step=0.1)
+
+    with col2:
+        price = st.number_input('Price', min_value=0.0, max_value=10000.0, step=0.1)
+
+    # Make predictions
+    if st.button('Predict Freight'):
+        # Create input DataFrame without encoding
+        freight_input_data = pd.DataFrame({
+            'product_weight_g': [product_weight_g],
+            'total_order_value': [total_order_value],
+            'price': [price]
+        })
+
+        # Make prediction
+        freight_prediction = freight_model.predict(freight_input_data)
+        freight = round(float(freight_prediction[0]), 2)  # Round to 2 decimal places
+
+        col1, col2 = st.columns([1, 1])
+
+        with col1:
+            st.markdown(f"""
+            <div class="time-card days">
+                <div class="header-font">Freight Value (R$)</div>
+                <div class="big-font">{freight}</div>
+            </div>
+            """, unsafe_allow_html=True)
+            
 
 
-with tabs[1]:
+
+with tabs[2]:
    st.markdown("## Visualization Section")
 
 
@@ -195,7 +241,7 @@ with tabs[1]:
        st.pyplot(fig)
 
 
-with tabs[2]:
+with tabs[3]:
    st.markdown("## NLP Reviews Analysis Section")
    # Add your NLP analysis code here
    # Load the SentimentIntensityAnalyzer
