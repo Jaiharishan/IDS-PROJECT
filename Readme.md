@@ -73,3 +73,7 @@ project-root/
 │   ├── main2.ipynb
 │   ├── nlp.ipynb
 ```
+
+
+## Milestone 3 video link
+[link](https://uflorida-my.sharepoint.com/:v:/g/personal/sravanigarapati_ufl_edu/EU7227nmYNRNuXA5KgCr7pwBMXnQp7ctWrzEFV-XYGrM8g?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=rREv9v)
